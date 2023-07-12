@@ -676,3 +676,15 @@ impl Drop for Client {
         let _ = unsafe { es_delete_client(self.as_mut()) };
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn test_client_can_connect() {
+        Client::new(|_client, _msg| {
+            println!("Got a message!");
+        }).unwrap();
+    }
+}
