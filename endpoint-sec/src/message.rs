@@ -27,6 +27,92 @@ use crate::{utils, Action, ActionResult, AuditToken, Event};
 /// before handing it over for your usage but that may not be enough, so be thorough in testing.
 ///
 /// See <https://developer.apple.com/documentation/endpointsecurity/3366178-es_free_message>.
+///
+/// ## A note on userspace events
+///
+/// Before macOS 13.0 almost all ES events were created by `xnu` (the macOS kernel).
+/// Such events are *mandatory*.
+/// If no `es_event_setuid_t` event is emitted then no `setuid` took place. This is a security guarantee.
+/// Most events added in macOS 13 and 14 are emitted by userspace binaries and frameworks.
+/// ES still guarantees that if an event was not emitted *by that binary or framework* then it did not happen, but this is not quite the same guarantee.
+///
+/// Consider `es_event_su_t`:
+/// This event is created by the `su` binary first shipped in macOS 14.0, but it's entirely possible for a user to install (or compile) a different `su`!
+/// ES only guarantees that the platform binary shipped with macOS emits `es_event_su_t` events.
+/// As such `es_event_su_t` does not provide the same security guarantee that `es_event_setuid_t` does.
+///
+/// When a user invokes the platform `su` binary ES will emit both `es_event_su_t` and `es_event_setuid_t` events.
+/// When a user compiles their own `su` binary from source and executes it:
+///
+/// - ES will emit an `es_event_setuid_t` event.
+/// - ES will NOT emit an `es_event_su_t`.
+///
+/// Userspace events are inherently discretionary.
+/// It is at the users discretion as to whether they use the builtin binaries/frameworks or not.
+/// Kernel events are mandatory. There is no `setuid` syscall that ES does not interdict.
+///
+/// The following events are created by userspace binaries or frameworks:
+///
+/// - [`ES_EVENT_TYPE_AUTH_FILE_PROVIDER_MATERIALIZE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_MATERIALIZE`]
+/// - [`ES_EVENT_TYPE_AUTH_FILE_PROVIDER_UPDATE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_FILE_PROVIDER_UPDATE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_AUTHENTICATION`]
+/// - [`ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED`]
+/// - [`ES_EVENT_TYPE_NOTIFY_XP_MALWARE_REMEDIATED`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGIN`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOGOUT`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LW_SESSION_LOCK`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LW_SESSION_UNLOCK`]
+/// - [`ES_EVENT_TYPE_NOTIFY_SCREENSHARING_ATTACH`]
+/// - [`ES_EVENT_TYPE_NOTIFY_SCREENSHARING_DETACH`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGIN`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OPENSSH_LOGOUT`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LOGIN_LOGIN`]
+/// - [`ES_EVENT_TYPE_NOTIFY_LOGIN_LOGOUT`]
+/// - [`ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_ADD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_BTM_LAUNCH_ITEM_REMOVE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_PROFILE_ADD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_PROFILE_REMOVE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_SU`]
+/// - [`ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_PETITION`]
+/// - [`ES_EVENT_TYPE_NOTIFY_AUTHORIZATION_JUDGEMENT`]
+/// - [`ES_EVENT_TYPE_NOTIFY_SUDO`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_GROUP_ADD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_GROUP_REMOVE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_GROUP_SET`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_MODIFY_PASSWORD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_DISABLE_USER`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_ENABLE_USER`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_ADD`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_VALUE_REMOVE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_ATTRIBUTE_SET`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_CREATE_USER`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_CREATE_GROUP`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_USER`]
+/// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP`]
+/// - [`ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE`]
+/// - [`ES_EVENT_TYPE_NOTIFY_TCC_MODIFY`]
+///
+/// ## A note on syscall events
+///
+/// Events which aren't submitted by usermode processes are broadly, but not
+/// exclusively, emitted by the kernel when a syscall is called. The names of
+/// events don't always match the names of syscalls exactly, for example the
+/// [`EventSignal`] event is emitted when `kill(2)` is called.
+///
+/// Some events are macOS specific and don't map to any unix syscall, like
+/// [`EventKextLoad`] and [`EventGetTask`].
+///
+/// Some events have names that are both concepts and syscalls for example:
+/// [`EventTruncate`] and [`EventCopyFile`]. Such events refer to these specific
+/// syscalls ONLY.
+///
+/// A truncate event does not indicate that a file is being truncated generally
+/// (for example by calling `open(2)` with the `O_TRUNC` flag), only specifically
+/// that `truncate(2)` was called. This is true for [`EventExchangeData`],
+/// [`EventClone`], [`EventCopyFile`], [`EventSearchFs`], etc. ES events always
+/// describe specific operations, not broad concepts.
 #[doc(alias = "es_message_t")]
 #[repr(transparent)]
 pub struct Message(NonNull<es_message_t>);

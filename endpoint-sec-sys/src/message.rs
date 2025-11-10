@@ -3383,6 +3383,26 @@ pub union es_result_t_anon_0 {
 /// - [`ES_EVENT_TYPE_NOTIFY_OD_DELETE_GROUP`]
 /// - [`ES_EVENT_TYPE_NOTIFY_GATEKEEPER_USER_OVERRIDE`]
 /// - [`ES_EVENT_TYPE_NOTIFY_TCC_MODIFY`]
+///
+/// ## A note on syscall events
+///
+/// Events which aren't submitted by usermode processes are broadly, but not
+/// exclusively, emitted by the kernel when a syscall is called. The names of
+/// events don't always match the names of syscalls exactly, for example the
+/// [`EventSignal`] event is emitted when `kill(2)` is called.
+///
+/// Some events are macOS specific and don't map to any unix syscall, like
+/// [`EventKextLoad`] and [`EventGetTask`].
+///
+/// Some events have names that are both concepts and syscalls for example:
+/// [`EventTruncate`] and [`EventCopyFile`]. Such events refer to these specific
+/// syscalls ONLY.
+///
+/// A truncate event does not indicate that a file is being truncated generally
+/// (for example by calling `open(2)` with the `O_TRUNC` flag), only specifically
+/// that `truncate(2)` was called. This is true for [`EventExchangeData`],
+/// [`EventClone`], [`EventCopyFile`], [`EventSearchFs`], etc. ES events always
+/// describe specific operations, not broad concepts.
 #[repr(C)]
 pub struct es_message_t {
     /// Indicates the message version; some fields are not available and must not be accessed unless
