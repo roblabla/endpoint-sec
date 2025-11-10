@@ -1746,7 +1746,7 @@ pub struct es_event_authentication_token_t {
 null_fields!(es_event_authentication_token_t; instigator -> es_process_t);
 
 /// Auto Unlock authentication data for type
-/// [`ES_AUTHENTICATION_TYPE_TOKEN`][crate::es_authentication_type_t].
+/// [`ES_AUTHENTICATION_TYPE_AUTO_UNLOCK`][crate::es_authentication_type_t].
 ///
 /// This kind of authentication is performed when authenticating to the local Mac using an Apple
 /// Watch for the purpose of unlocking the machine or confirming an authorization prompt. Auto
