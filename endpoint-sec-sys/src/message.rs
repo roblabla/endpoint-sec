@@ -1815,6 +1815,12 @@ pub struct es_event_xp_malware_detected_t {
     /// Path where malware was detected. This path is not necessarily a malicious binary, it can
     /// also be a legitimate file containing a malicious portion.
     pub detected_path: es_string_token_t,
+    /// Path to malicious binary. This can differ from `detected_path` when the
+    /// detected path is an app bundle.
+    ///
+    /// Field available only if message version >= 10.
+    #[cfg(feature = "macos_26_0_0")]
+    pub detected_executable: es_string_token_t,
 }
 
 /// Notification that XProtect remediated malware.

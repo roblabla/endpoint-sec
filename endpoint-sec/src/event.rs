@@ -309,7 +309,7 @@ define_event_enum!(
         /// Notify an authentication was performed.
         ES_EVENT_TYPE_NOTIFY_AUTHENTICATION => NotifyAuthentication(EventAuthentication [_ => None] { raw: raw_event.authentication.as_opt()?, version, }),
         /// Notify that XProtect detected malware.
-        ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED => NotifyXpMalwareDetected(EventXpMalwareDetected [_ => None] { raw: raw_event.xp_malware_detected.as_opt()?, }),
+        ES_EVENT_TYPE_NOTIFY_XP_MALWARE_DETECTED => NotifyXpMalwareDetected(EventXpMalwareDetected [_ => None] { raw: raw_event.xp_malware_detected.as_opt()?, version, }),
         /// Notify that XProtect remediated malware.
         ES_EVENT_TYPE_NOTIFY_XP_MALWARE_REMEDIATED => NotifyXpMalwareRemediated(EventXpMalwareRemediated [_ => None] { raw: raw_event.xp_malware_remediated.as_opt()?, }),
         /// Notify that LoginWindow has logged in a user.
