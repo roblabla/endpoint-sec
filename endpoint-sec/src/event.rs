@@ -121,7 +121,7 @@ define_event_enum!(
         /// Notify a file system being unmounted.
         ES_EVENT_TYPE_NOTIFY_UNMOUNT => NotifyUnmount(EventUnmount [_ => None ] { raw: &raw_event.unmount, }),
         /// Notify a connection being opened to an I/O Kit IOService.
-        ES_EVENT_TYPE_NOTIFY_IOKIT_OPEN => NotifyIoKitOpen(EventIoKitOpen [_ => None ] { raw: &raw_event.iokit_open, }),
+        ES_EVENT_TYPE_NOTIFY_IOKIT_OPEN => NotifyIoKitOpen(EventIoKitOpen [_ => None ] { raw: &raw_event.iokit_open, version, }),
         /// Notify a file system object being renamed.
         ES_EVENT_TYPE_NOTIFY_RENAME => NotifyRename(EventRename [_ => None ] { raw: &raw_event.rename, }),
         /// Notify when file system attributes are being modified.
@@ -261,7 +261,7 @@ define_event_enum!(
         /// Authorization request for a file control.
         ES_EVENT_TYPE_AUTH_FCNTL => AuthFcntl(EventFcntl [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.fcntl, }),
         /// Authorization request for a connection being opened to an I/O Kit IOService.
-        ES_EVENT_TYPE_AUTH_IOKIT_OPEN => AuthIoKitOpen(EventIoKitOpen [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.iokit_open, }),
+        ES_EVENT_TYPE_AUTH_IOKIT_OPEN => AuthIoKitOpen(EventIoKitOpen [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.iokit_open, version, }),
         /// Authorization request for one of `pid_suspend()`, `pid_resume()` or `pid_shutdown_sockets()` to be called
         ES_EVENT_TYPE_AUTH_PROC_SUSPEND_RESUME => AuthProcSuspendResume( EventProcSuspendResume [_ => Some(ExpectedResponseType::Auth) ] { raw: &raw_event.proc_suspend_resume, version, } ),
         /// called on a process.

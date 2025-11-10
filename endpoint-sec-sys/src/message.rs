@@ -996,7 +996,21 @@ pub struct es_event_iokit_open_t {
     pub user_client_type: u32,
     /// Meta class name of the user client instance
     pub user_client_class: es_string_token_t,
-    _reserved: [u8; 64],
+    /// The IOKit registry ID of the parent of the user class. Conceptually this
+    /// is what the user class is connecting to. It can be resolved to a an
+    /// `io_service_t` with by calling `IORegistryEntryIDMatching` then
+    /// `IOServiceGetMatchingService`
+    ///
+    /// Field available only if message version >= 10.
+    #[cfg(feature = "macos_26_0_0")]
+    pub parent_registry_id: u64,
+    /// The path in the IOKit device tree to the class being opened. It can be
+    /// resolved to an `io_registry_entry_t` by calling `IORegistryEntryFromPath`.
+    ///
+    /// Field available only if message version >= 10.
+    #[cfg(feature = "macos_26_0_0")]
+    pub parent_path: es_string_token_t,
+    _reserved: [u8; 40],
 }
 
 /// Get a process's task control port.
