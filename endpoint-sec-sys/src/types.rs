@@ -792,3 +792,140 @@ ffi_wrap_enum!(
     --
     ES_TCC_IDENTITY_TYPE_FILE_PROVIDER_DOMAIN_ID = 3,
 );
+
+#[cfg(feature = "macos_13_0_0")]
+ffi_wrap_enum!(
+    /// See [`es_event_authentication_auto_unlock_t`].
+    es_auto_unlock_type_t(u32);
+
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
+    /// Unlock the machine using Apple Watch.
+    ES_AUTO_UNLOCK_MACHINE_UNLOCK = 1,
+    --
+    /// Approve an authorization prompt using Apple Watch.
+    ES_AUTO_UNLOCK_AUTH_PROMPT = 2,
+);
+
+#[cfg(feature = "macos_13_0_0")]
+ffi_wrap_enum!(
+    /// Type of launch item.
+    ///
+    /// See [`es_btm_launch_item_t`]
+    es_btm_item_type_t(u32);
+
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
+    ES_BTM_ITEM_TYPE_USER_ITEM = 0,
+    ES_BTM_ITEM_TYPE_APP = 1,
+    ES_BTM_ITEM_TYPE_LOGIN_ITEM = 2,
+    ES_BTM_ITEM_TYPE_AGENT = 3,
+    --
+    ES_BTM_ITEM_TYPE_DAEMON = 4,
+);
+
+ffi_wrap_enum!(
+    /// See [`es_event_create_t`] / [`es_event_rename_t`]
+    es_destination_type_t(u32);
+
+    == MACOS_10_15_0;
+    ES_DESTINATION_TYPE_EXISTING_FILE = 0,
+    --
+    ES_DESTINATION_TYPE_NEW_PATH = 1,
+);
+
+ffi_wrap_enum!(
+    /// See [`es_event_get_task_t`]
+    es_get_task_type_t(u32);
+
+    == MACOS_10_15_0;
+    /// Task port obtained by calling e.g. `task_for_pid()`, where the caller obtains a task port
+    /// for a process identified by pid
+    ES_GET_TASK_TYPE_TASK_FOR_PID = 0,
+    /// Task port obtained by calling e.g. `processor_set_tasks()`, where the caller obtains a set
+    /// of task ports
+    ES_GET_TASK_TYPE_EXPOSE_TASK = 1,
+    --
+    /// Task port obtained by calling e.g. `task_identity_token_get_task_port()`, where the caller
+    /// obtains a task port for a process identified by an identity token. Task identity tokens
+    /// generally have to be given up by the target process voluntarily prior to the conversion
+    /// into task ports.
+    ES_GET_TASK_TYPE_IDENTITY_TOKEN = 2,
+);
+
+#[cfg(feature = "macos_13_0_0")]
+ffi_wrap_enum!(
+    /// See [`es_event_openssh_login_t`]
+    es_openssh_login_result_type_t(u32);
+
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
+    ES_OPENSSH_LOGIN_EXCEED_MAXTRIES = 0,
+    ES_OPENSSH_LOGIN_ROOT_DENIED = 1,
+    ES_OPENSSH_AUTH_SUCCESS = 2,
+    ES_OPENSSH_AUTH_FAIL_NONE = 3,
+    ES_OPENSSH_AUTH_FAIL_PASSWD = 4,
+    ES_OPENSSH_AUTH_FAIL_KBDINT = 5,
+    ES_OPENSSH_AUTH_FAIL_PUBKEY = 6,
+    ES_OPENSSH_AUTH_FAIL_HOSTBASED = 7,
+    ES_OPENSSH_AUTH_FAIL_GSSAPI = 8,
+    --
+    ES_OPENSSH_INVALID_USER = 9,
+);
+
+#[cfg(feature = "macos_15_0_0")]
+ffi_wrap_enum!(
+    /// The type of device being mounted.
+    ///
+    /// See [`es_event_mount_t`]
+    es_mount_disposition_t(u32);
+
+    == #[cfg(feature = "macos_15_0_0")] 15_0_0 "15.0.0";
+    /// Device is external storage.
+    ES_MOUNT_DISPOSITION_EXTERNAL = 0,
+    /// Device is internal storage.
+    ES_MOUNT_DISPOSITION_INTERNAL = 1,
+    /// Device is a network share.
+    ES_MOUNT_DISPOSITION_NETWORK = 2,
+    /// Device is virtual (dmg or file).
+    ES_MOUNT_DISPOSITION_VIRTUAL = 3,
+    /// Mount uses nullfs, commonly for app translocation
+    ES_MOUNT_DISPOSITION_NULLFS = 4,
+    --
+    /// unable to determine disposition
+    ES_MOUNT_DISPOSITION_UNKNOWN = 5,
+);
+
+ffi_wrap_enum!(
+    /// This enum describes the type of suspend/resume operations that are currently used
+    es_proc_suspend_resume_type_t(u32);
+
+    == MACOS_10_15_0;
+    ES_PROC_SUSPEND_RESUME_TYPE_SUSPEND = 0,
+    ES_PROC_SUSPEND_RESUME_TYPE_RESUME = 1,
+    --
+    ES_PROC_SUSPEND_RESUME_TYPE_SHUTDOWN_SOCKETS = 3,
+);
+
+#[cfg(feature = "macos_14_0_0")]
+ffi_wrap_enum!(
+    /// Source of profile installation (MDM/Manual Install).
+    ///
+    /// See [`es_profile_t`]
+    es_profile_source_t(u32);
+
+    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
+    /// MDM (managed) installation
+    ES_PROFILE_SOURCE_MANAGED = 0,
+    --
+    /// Manual installation
+    ES_PROFILE_SOURCE_INSTALL = 1,
+);
+
+#[cfg(feature = "macos_13_0_0")]
+ffi_wrap_enum!(
+    /// See [`es_event_authentication_touchid_t`]
+    es_touchid_mode_t(u32);
+
+    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
+    ES_TOUCHID_MODE_VERIFICATION = 0,
+    --
+    ES_TOUCHID_MODE_IDENTIFICATION = 1,
+);

@@ -23,18 +23,19 @@ use super::es_proc_check_type_t;
 #[cfg(feature = "macos_10_15_1")]
 use super::{acl_t, es_set_or_clear_t};
 use super::{
-    attrlist, audit_token_t, es_action_type_t, es_auth_result_t, es_cdhash_t, es_event_id_t, es_event_type_t,
-    es_result_type_t, es_string_token_t, es_token_t, user_addr_t, user_size_t, ShouldNotBeNull,
+    attrlist, audit_token_t, es_action_type_t, es_auth_result_t, es_cdhash_t, es_destination_type_t, es_event_id_t,
+    es_event_type_t, es_get_task_type_t, es_proc_suspend_resume_type_t, es_result_type_t, es_string_token_t, es_token_t, user_addr_t, user_size_t,
+    ShouldNotBeNull,
 };
 #[cfg(feature = "macos_13_0_0")]
-use super::{es_address_type_t, es_authentication_type_t};
+use super::{es_address_type_t, es_authentication_type_t, es_auto_unlock_type_t, es_btm_item_type_t, es_openssh_login_result_type_t, es_touchid_mode_t};
 #[cfg(feature = "macos_14_0_0")]
 use super::{
     es_authorization_rule_class_t, es_od_account_type_t, es_od_member_type_t, es_od_record_type_t,
-    es_sudo_plugin_type_t, es_xpc_domain_type_t,
+    es_profile_source_t, es_sudo_plugin_type_t, es_xpc_domain_type_t,
 };
 #[cfg(feature = "macos_15_0_0")]
-use super::{es_gatekeeper_user_override_file_type_t, es_sha256_t, es_signed_file_info_t};
+use super::{es_gatekeeper_user_override_file_type_t, es_mount_disposition_t, es_sha256_t, es_signed_file_info_t};
 #[cfg(feature = "macos_15_4_0")]
 use super::{es_tcc_authorization_reason_t, es_tcc_authorization_right_t, es_tcc_event_type_t, es_tcc_identity_type_t};
 
@@ -238,22 +239,6 @@ pub struct es_fd_t_anon_0_pipe {
     pub pipe_id: u64,
 }
 
-#[cfg(feature = "macos_13_0_0")]
-ffi_wrap_enum!(
-    /// Type of launch item.
-    ///
-    /// See [`es_btm_launch_item_t`]
-    es_btm_item_type_t(u32);
-
-    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
-    ES_BTM_ITEM_TYPE_USER_ITEM = 0,
-    ES_BTM_ITEM_TYPE_APP = 1,
-    ES_BTM_ITEM_TYPE_LOGIN_ITEM = 2,
-    ES_BTM_ITEM_TYPE_AGENT = 3,
-    --
-    ES_BTM_ITEM_TYPE_DAEMON = 4,
-);
-
 /// Structure describing a BTM launch item
 #[cfg(feature = "macos_13_0_0")]
 #[repr(C)]
@@ -274,21 +259,6 @@ pub struct es_btm_launch_item_t {
     // NOTE: find out how optionality is modeled. Empty string ? Linked to an enum member ?
     pub app_url: es_string_token_t,
 }
-
-#[cfg(feature = "macos_14_0_0")]
-ffi_wrap_enum!(
-    /// Source of profile installation (MDM/Manual Install).
-    ///
-    /// See [`es_profile_t`]
-    es_profile_source_t(u32);
-
-    == #[cfg(feature = "macos_14_0_0")] 14_0_0 "14.0.0";
-    /// MDM (managed) installation
-    ES_PROFILE_SOURCE_MANAGED = 0,
-    --
-    /// Manual installation
-    ES_PROFILE_SOURCE_INSTALL = 1,
-);
 
 #[cfg(feature = "macos_14_0_0")]
 #[repr(C)]
@@ -516,29 +486,6 @@ pub struct es_event_link_t {
 
 should_not_be_null_fields!(es_event_link_t; source -> es_file_t, target_dir -> es_file_t);
 
-#[cfg(feature = "macos_15_0_0")]
-ffi_wrap_enum!(
-    /// The type of device being mounted.
-    ///
-    /// See [`es_event_mount_t`]
-    es_mount_disposition_t(u32);
-
-    == #[cfg(feature = "macos_15_0_0")] 15_0_0 "15.0.0";
-    /// Device is external storage.
-    ES_MOUNT_DISPOSITION_EXTERNAL = 0,
-    /// Device is internal storage.
-    ES_MOUNT_DISPOSITION_INTERNAL = 1,
-    /// Device is a network share.
-    ES_MOUNT_DISPOSITION_NETWORK = 2,
-    /// Device is virtual (dmg or file).
-    ES_MOUNT_DISPOSITION_VIRTUAL = 3,
-    /// Mount uses nullfs, commonly for app translocation
-    ES_MOUNT_DISPOSITION_NULLFS = 4,
-    --
-    /// unable to determine disposition
-    ES_MOUNT_DISPOSITION_UNKNOWN = 5,
-);
-
 /// Mount a file system
 ///
 /// Cache key for this event type: `(process executable file, mount point)`.
@@ -671,15 +618,6 @@ pub struct es_event_signal_t {
 should_not_be_null_fields!(es_event_signal_t; target -> es_process_t);
 #[cfg(feature = "macos_15_4_0")]
 null_fields!(es_event_signal_t; instigator -> es_process_t);
-
-ffi_wrap_enum!(
-    es_destination_type_t(u32);
-
-    == MACOS_10_15_0;
-    ES_DESTINATION_TYPE_EXISTING_FILE = 0,
-    --
-    ES_DESTINATION_TYPE_NEW_PATH = 1,
-);
 
 /// Rename a file system object.
 ///
@@ -1060,24 +998,6 @@ pub struct es_event_iokit_open_t {
     pub user_client_class: es_string_token_t,
     _reserved: [u8; 64],
 }
-
-ffi_wrap_enum!(
-    es_get_task_type_t(u32);
-
-    == MACOS_10_15_0;
-    /// Task port obtained by calling e.g. `task_for_pid()`, where the caller obtains a task port
-    /// for a process identified by pid
-    ES_GET_TASK_TYPE_TASK_FOR_PID = 0,
-    /// Task port obtained by calling e.g. `processor_set_tasks()`, where the caller obtains a set
-    /// of task ports
-    ES_GET_TASK_TYPE_EXPOSE_TASK = 1,
-    --
-    /// Task port obtained by calling e.g. `task_identity_token_get_task_port()`, where the caller
-    /// obtains a task port for a process identified by an identity token. Task identity tokens
-    /// generally have to be given up by the target process voluntarily prior to the conversion
-    /// into task ports.
-    ES_GET_TASK_TYPE_IDENTITY_TOKEN = 2,
-);
 
 /// Get a process's task control port.
 ///
@@ -1582,17 +1502,6 @@ pub struct es_event_searchfs_t {
 #[cfg(feature = "macos_11_0_0")]
 should_not_be_null_fields!(es_event_searchfs_t; target -> es_file_t);
 
-ffi_wrap_enum!(
-    /// This enum describes the type of suspend/resume operations that are currently used
-    es_proc_suspend_resume_type_t(u32);
-
-    == MACOS_10_15_0;
-    ES_PROC_SUSPEND_RESUME_TYPE_SUSPEND = 0,
-    ES_PROC_SUSPEND_RESUME_TYPE_RESUME = 1,
-    --
-    ES_PROC_SUSPEND_RESUME_TYPE_SHUTDOWN_SOCKETS = 3,
-);
-
 /// Fired when one of pid_suspend, pid_resume or pid_shutdown_sockets is called on a process
 ///
 /// This event type does not support caching.
@@ -1765,17 +1674,6 @@ pub struct es_event_authentication_od_t {
 #[cfg(feature = "macos_13_0_0")]
 null_fields!(es_event_authentication_od_t; instigator -> es_process_t);
 
-#[cfg(feature = "macos_13_0_0")]
-ffi_wrap_enum!(
-    /// See [`es_event_authentication_touchid_t`]
-    es_touchid_mode_t(u32);
-
-    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
-    ES_TOUCHID_MODE_VERIFICATION = 0,
-    --
-    ES_TOUCHID_MODE_IDENTIFICATION = 1,
-);
-
 /// TouchID authentication data for type
 /// [`ES_AUTHENTICATION_TYPE_TOUCHID`][crate::es_authentication_type_t].
 #[cfg(feature = "macos_13_0_0")]
@@ -1832,19 +1730,6 @@ pub struct es_event_authentication_token_t {
 
 #[cfg(feature = "macos_13_0_0")]
 null_fields!(es_event_authentication_token_t; instigator -> es_process_t);
-
-#[cfg(feature = "macos_13_0_0")]
-ffi_wrap_enum!(
-    /// See [`es_event_authentication_auto_unlock_t`].
-    es_auto_unlock_type_t(u32);
-
-    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
-    /// Unlock the machine using Apple Watch.
-    ES_AUTO_UNLOCK_MACHINE_UNLOCK = 1,
-    --
-    /// Approve an authorization prompt using Apple Watch.
-    ES_AUTO_UNLOCK_AUTH_PROMPT = 2,
-);
 
 /// Auto Unlock authentication data for type
 /// [`ES_AUTHENTICATION_TYPE_TOKEN`][crate::es_authentication_type_t].
@@ -2064,25 +1949,6 @@ pub struct es_event_screensharing_detach_t {
     /// Graphical session id of the screen shared.
     pub graphical_session_id: es_graphical_session_id_t,
 }
-
-#[cfg(feature = "macos_13_0_0")]
-ffi_wrap_enum!(
-    /// See [`es_event_openssh_login_t`]
-    es_openssh_login_result_type_t(u32);
-
-    == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
-    ES_OPENSSH_LOGIN_EXCEED_MAXTRIES = 0,
-    ES_OPENSSH_LOGIN_ROOT_DENIED = 1,
-    ES_OPENSSH_AUTH_SUCCESS = 2,
-    ES_OPENSSH_AUTH_FAIL_NONE = 3,
-    ES_OPENSSH_AUTH_FAIL_PASSWD = 4,
-    ES_OPENSSH_AUTH_FAIL_KBDINT = 5,
-    ES_OPENSSH_AUTH_FAIL_PUBKEY = 6,
-    ES_OPENSSH_AUTH_FAIL_HOSTBASED = 7,
-    ES_OPENSSH_AUTH_FAIL_GSSAPI = 8,
-    --
-    ES_OPENSSH_INVALID_USER = 9,
-);
 
 /// Notification for OpenSSH login event.
 ///
