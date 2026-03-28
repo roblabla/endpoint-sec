@@ -519,20 +519,35 @@ impl es_string_token_t {
 
 ffi_wrap_enum!(
     /// Values that will be paired with path strings to describe the type of the path
+    ///
+    /// Be careful with symlinks, muting happens AFTER symlink resolution.
+    /// Muting '/tmp' won't work because it's a symlink to '/private/tmp'.
     es_mute_path_type_t(u32);
 
     == MACOS_10_15_0;
-    /// Value to describe a path prefix
+    /// Value to describe a prefix for the path to the instigating program,
+    /// e.g. `/bin` would match `/bin/ls` and `/bin/sleep`. This is a type of
+    /// *program* muting. It could match multiple proccessesValue to describe a
+    /// path prefix.
     ES_MUTE_PATH_TYPE_PREFIX = 0,
     --
-    /// Value to describe a path literal
+    /// Value to describe the exact path to the instigating program.
+    /// **Must match exactly**, eg `/bin/ls` would match `/bin/ls` but NOT match
+    /// `/bin/lsa`.
     ES_MUTE_PATH_TYPE_LITERAL = 1,
 
     == #[cfg(feature = "macos_13_0_0")] 13_0_0 "13.0.0";
-    /// Value to describe a target path prefix
+    /// Value to describe a target path prefix. Target here has a very specific
+    /// meaning, see [`es_mute_path`]. Briefly, this type of muting matches the
+    /// *argument(s)* to syscalls, rather than the instigating program.
+    /// Prefix matching means `/private/tmp` would match
+    /// `open(/private/tmp/cake)`
     ES_MUTE_PATH_TYPE_TARGET_PREFIX = 2,
     --
-    /// Value to describe a target path literal
+    /// Value to describe a target path literal.
+    /// Behaves just like [`ES_MUTE_PATH_TYPE_TARGET_PREFIX`] except that the
+    /// target path must match *exactly*, e.g. `/private/tmp/foo` would match
+    /// `open(/private/tmp/foo)` but NOT match `open(/private/tmp/foobar)`.
     ES_MUTE_PATH_TYPE_TARGET_LITERAL = 3,
 );
 

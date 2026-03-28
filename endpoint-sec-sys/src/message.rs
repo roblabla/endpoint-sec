@@ -316,6 +316,8 @@ pub struct es_profile_t {
 /// different if the new program had `setuid`/`setgid` permission bits set.
 ///
 /// Cache key for this event type: `(process executable file, target executable file)`.
+///
+/// Caching is not supported when `script` is nonnull
 #[repr(C)]
 // 10.15.0
 pub struct es_event_exec_t {
