@@ -165,6 +165,11 @@ pub struct es_process_t {
     /// Field available only if message version >= 4.
     #[cfg(feature = "macos_11_0_0")]
     pub parent_audit_token: audit_token_t,
+    /// Indicates the codesigning validation policy that authorized this binary.
+    ///
+    /// Field available only if message version >= 10.
+    #[cfg(feature = "macos_26_0_0")]
+    pub cs_validation_category: es_cs_validation_category_t,
 }
 
 should_not_be_null_fields!(es_process_t; executable -> es_file_t);

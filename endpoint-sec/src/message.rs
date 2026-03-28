@@ -603,6 +603,16 @@ impl<'a> Process<'a> {
             None
         }
     }
+
+    /// Indicates the codesigning validation policy that authorized this binary.
+    #[cfg(feature = "macos_26_0_0")]
+    pub fn cs_validation_category(&self) -> Option<es_cs_validation_category_t> {
+        if self.version >= 10 {
+            Some(self.raw.cs_validation_category)
+        } else {
+            None
+        }
+    }
 }
 
 // Safety: safe to send across threads: does not contain any interior mutability nor depend on current thread state

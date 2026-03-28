@@ -793,6 +793,26 @@ ffi_wrap_enum!(
     ES_TCC_IDENTITY_TYPE_FILE_PROVIDER_DOMAIN_ID = 3,
 );
 
+/// Indicates the code signature validation policy that was applied to a binary
+#[cfg(feature = "macos_26_0_0")]
+ffi_wrap_enum!(
+    es_cs_validation_category_t(u32);
+
+    == #[cfg(feature = "macos_15_4_0")] 15_4_0 "15.4.0"
+    ES_CS_VALIDATION_CATEGORY_INVALID = 0,
+    ES_CS_VALIDATION_CATEGORY_PLATFORM = 1,
+    ES_CS_VALIDATION_CATEGORY_TESTFLIGHT = 2,
+    ES_CS_VALIDATION_CATEGORY_DEVELOPMENT = 3,
+    ES_CS_VALIDATION_CATEGORY_APP_STORE = 4,
+    ES_CS_VALIDATION_CATEGORY_ENTERPRISE = 5,
+    ES_CS_VALIDATION_CATEGORY_DEVELOPER_ID = 6,
+    ES_CS_VALIDATION_CATEGORY_LOCAL_SIGNING = 7,
+    ES_CS_VALIDATION_CATEGORY_ROSETTA = 8,
+    ES_CS_VALIDATION_CATEGORY_OOPJIT = 9,
+    --
+    ES_CS_VALIDATION_CATEGORY_NONE = 10,
+);
+
 #[cfg(feature = "macos_13_0_0")]
 ffi_wrap_enum!(
     /// See [`es_event_authentication_auto_unlock_t`].
